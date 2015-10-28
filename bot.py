@@ -47,23 +47,10 @@ class Client(object):
 		connector = XMPPClientConnector(reactor, client_jid.host, f)
 		connector.connect()
 
-
-	def rawDataIn(self, buf):
-		print "RECV: %s" % unicode(buf, 'utf-8').encode('ascii', 'replace')
-
-
-	def rawDataOut(self, buf):
-		print "SEND: %s" % unicode(buf, 'utf-8').encode('ascii', 'replace')
-
-
 	def connected(self, xs):
 		print 'Connected.'
 
 		self.xmlstream = xs
-
-		# Log all traffic
-		xs.rawDataInFn = self.rawDataIn
-		xs.rawDataOutFn = self.rawDataOut
 
 	def disconnected(self, xs):
 		print 'Disconnected.'
