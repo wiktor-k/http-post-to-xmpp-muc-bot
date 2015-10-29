@@ -1,5 +1,8 @@
 import sys
 import os
+import json
+
+from nanotemplates import render
 
 from twisted.internet import reactor
 from twisted.names.srvconnect import SRVConnector
@@ -16,7 +19,10 @@ class WebServer(Resource):
 
 	def render_POST(self, request):
 		"""Respond to a POST request"""
-		self.jabberClient.sendMessage(request.content.read().decode('utf-8'))
+		content = request.content.read().decode('utf-8')
+		if 'template' in request.args:
+			content = render(json.loads(content), request.args['template'][0])
+		self.jabberClient.sendMessage(content)
 		return 'OK'
 
 class XMPPClientConnector(SRVConnector):
