@@ -3,6 +3,9 @@ import json
 import re
 import sys
 
+value_replace = re.compile('{([^/][^ }]+)}', re.MULTILINE | re.DOTALL)
+map_replace = re.compile('{map ([^ /}]+)}(.*?){/map}', re.MULTILINE | re.DOTALL)
+
 def render(data, template):
   def get_key(obj, key):
     return None if obj is None else obj.get(key)
@@ -21,13 +24,13 @@ def render(data, template):
     return ''.join(map(in_scope, container))
 
   # replace maps
-  text = re.sub(r'{map ([^ /}]+)}(.*?){/map}', replaceMap, template)
+  text = re.sub(map_replace, replaceMap, template)
   
   # replace access to properties
   def replace(match):
     return reduce(get_key, match.group(1).split('.'), data)
 
-  text = re.sub(r'{([^/][^ }]+)}', replace, text)
+  text = re.sub(value_replace, replace, text)
   
   # replace objects themselves
   text = text.replace('{}', str(data))
@@ -55,6 +58,9 @@ Finished: SUCCESS
     self.assertEqual(render(fixture, "a-{map commits}{.name}-{/map}"), "a-one-two-three-")
     self.assertEqual(render(fixture, "a-{map commits}{.name}-{/map}{name}"), "a-one-two-three-project")
     self.assertEqual(render(fixture, "a-{map strings}{}-{/map}{name}"), "a-a-b-c-project")
+    
+  def test_multiline_map(self):
+    self.assertEqual(render(fixture, "a-\n{map commits}\n{.name}-\n{/map}"), "a-\n\none-\n\ntwo-\n\nthree-\n")
 
 if __name__ == "__main__":
   print render(json.loads('\n'.join(sys.stdin.readlines())), sys.argv[1])
