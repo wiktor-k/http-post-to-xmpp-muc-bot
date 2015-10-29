@@ -63,7 +63,6 @@ class Client(object):
 
 		presence = domish.Element((None, 'presence'))
 		xs.send(presence)
-		xs.addObserver("/message", self.handleMessage)
 
 		#reactor.callLater(5, xs.sendFooter)
 		"""Join a MUC"""
@@ -95,11 +94,6 @@ class Client(object):
 		print failure
 
 		self.xmlstream.sendFooter()
-
-	def handleMessage(self, message):
-		for el in message.elements():
-			if el.name == "body":
-				print("%s: %s" % (message["from"], el))
 
 client_jid = jid.JID(os.environ['JID'])
 secret = os.environ['PASSWORD']
