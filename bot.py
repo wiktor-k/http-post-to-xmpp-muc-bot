@@ -16,7 +16,7 @@ class WebServer(Resource):
 
 	def render_POST(self, request):
 		"""Respond to a POST request"""
-		self.jabberClient.sendMessage(request.content.read())
+		self.jabberClient.sendMessage(request.content.read().decode('utf-8'))
 		return 'OK'
 
 class XMPPClientConnector(SRVConnector):
